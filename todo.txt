@@ -1,0 +1,19 @@
+In client app:
+- Create class ServerProxy with methods:
+	LoginResult login(LoginRequest r) {}
+	RegisterResult register(RegisterRequest r) {}
+	List<Person> getPeople(authtoken)
+	List<Event> getEvents(authtoken)
+
+
+- Also create a singleton class DataCache for where to store events and people
+	private static DataCache instance;
+	
+	public static synchronized DataCache getInstance() {
+		if (instance == null)
+			instance = new DataCache;
+
+		return instance;
+	}
+
+	private DataCache() {}
