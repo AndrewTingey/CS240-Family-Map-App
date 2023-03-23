@@ -1,0 +1,27 @@
+Login assignment
+    Share code between intellij and here
+
+    {
+        Create your Main Activity class (see the Family Map specification for details on Main Activity).
+
+        Create your Login Fragment class including all of its GUI components (see the Family Map specification for more details on Login Fragment).
+
+        Embed your Login Fragment in your Main Activity’s GUI.
+
+        When the user clicks the “SIGN IN” button, create a background task that uses HttpURLConnection to send a login request to the Family Map server.
+
+        If the login request fails, display an Android toast indicating that the login failed.
+
+        If the login request succeeds, use the HttpURLConnection again to retrieve the logged-in user’s family data from the server. When the family data is received, display an Android toast containing the logged-in user’s first and last names.
+
+        Repeat steps 5 – 7 for new user registration and the “REGISTER” button.
+
+        Pass off your login/register functionality with a TA.
+    }
+
+    use SwitchFragmentExample project using MainActivity, LoginFragment, RegisterFragment
+
+TODO:
+    logic for onGenderButtonClicked() should be in Login.java, rn its in MainActivity.java
+    That stuff^
+
