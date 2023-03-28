@@ -25,3 +25,13 @@ TODO:
     logic for onGenderButtonClicked() should be in Login.java, rn its in MainActivity.java
     That stuff^
 
+Notes from class:
+    Use a thread from the login fragment to call the serverProxy class to access the internet
+    create thread form UI thread using java.util.concurrent package
+    Create handler class: background_tasks.pptx.20
+    Call the tasks from the buttons with the handler
+
+Latest:
+    after loggin in,
+    use the http commands /event, /user and /user/ownID
+    cache the data of the first two and display first/last name on a toast

@@ -76,12 +76,10 @@ public class Login extends Fragment {
         switch(view.getId()) {
             case R.id.femaleButton:
                 if (checked)
-                    // Pirates are the best
                     System.out.println("Female Button hit");
                     break;
             case R.id.maleButton:
                 if (checked)
-                    // Ninjas rule
                     System.out.println("Male Button hit");
                     break;
         }

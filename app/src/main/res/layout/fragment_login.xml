@@ -137,11 +137,13 @@
             android:id="@+id/LoginButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="2dp"
             android:text="@string/Login" />
         <Button
             android:id="@+id/RegisterButton"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:layout_margin="2dp"
             android:text="@string/Register"
             />
     </LinearLayout>
