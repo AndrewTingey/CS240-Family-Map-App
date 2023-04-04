@@ -45,7 +45,6 @@ public class DataCache {
         } };
     private final Set<String> eventTypes = new HashSet<>();
     private final Map<String, Event> eventByID = new HashMap<>();
-    private final Map<String, Person> spouseByID = new HashMap<>();
     private Person user;
 
     //immediate family
@@ -63,7 +62,6 @@ public class DataCache {
         instance = getInstance();
         this.authtoken = authtoken;
         for (Person person : people) {
-            spouseByID.put(person.getSpouseID(), person);
             peopleByID.put(person.getPersonID(), person);
         }
         this.user = peopleByID.get(userID);
@@ -226,6 +224,7 @@ public class DataCache {
     }
 
     public Person getSpouseByID(String personID) {
-        return spouseByID.get(personID);
+        Person person = getPeopleByID(personID);
+        return getPeopleByID(person.getSpouseID());
     }
 }

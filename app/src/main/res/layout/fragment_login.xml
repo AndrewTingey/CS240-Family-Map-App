@@ -6,7 +6,7 @@
     android:layout_margin="16dp"
     android:stretchColumns="3"
     android:id="@+id/loginFragment"
-    tools:context="UserInterface.LoginFragment">
+    tools:context=".UserInterface.LoginFragment">
     <TableRow>
         <TextView
             android:layout_height="wrap_content"
@@ -126,10 +126,9 @@
                 android:text="@string/female" />
         </RadioGroup>
     </TableRow>
-
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingTop="20dp"
         android:gravity="center_horizontal">
@@ -145,6 +144,26 @@
             android:layout_width="wrap_content"
             android:layout_margin="2dp"
             android:text="@string/Register"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingTop="80dp"
+        android:gravity="center_horizontal">
+        <Button
+            android:id="@+id/search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:text="SEARCH" />
+        <Button
+            android:id="@+id/settings_button"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_margin="2dp"
+            android:text="SETTINGS"
             />
     </LinearLayout>
 </TableLayout>

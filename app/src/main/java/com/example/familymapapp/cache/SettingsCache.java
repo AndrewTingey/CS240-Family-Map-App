@@ -1,6 +1,60 @@
 package com.example.familymapapp.cache;
 
 public class SettingsCache {
-    //TODO
-    //DR. Wilkerson also cached event color and Settings, but not nessesary
+    private static SettingsCache instance;
+    private SettingsCache() {}
+    public static SettingsCache getInstance() {
+        if (instance == null) {
+            instance = new SettingsCache();
+        }
+        return instance;
+    }
+    boolean isLifeStoryLines;
+    boolean isFamilyTreeLines;
+    boolean isSpouseLines;
+    boolean isFatherSide;
+    boolean isMotherSide;
+    boolean isMaleEvents;
+    boolean isFemaleEvents;
+
+    public void setSettings(boolean lifeStoryLines, boolean isFamilyTreeLines,
+                                  boolean isSpouseLines, boolean isFatherSide,
+                                  boolean isMotherSide, boolean isMaleEvents,
+                                  boolean isFemaleEvents) {
+        this.isLifeStoryLines = lifeStoryLines;
+        this.isFamilyTreeLines = isFamilyTreeLines;
+        this.isSpouseLines = isSpouseLines;
+        this.isFatherSide = isFatherSide;
+        this.isMotherSide = isMotherSide;
+        this.isMaleEvents = isMaleEvents;
+        this.isFemaleEvents = isFemaleEvents;
+    }
+
+    public boolean isLifeStoryLines() {
+        return isLifeStoryLines;
+    }
+
+    public boolean isFamilyTreeLines() {
+        return isFamilyTreeLines;
+    }
+
+    public boolean isSpouseLines() {
+        return isSpouseLines;
+    }
+
+    public boolean isFatherSide() {
+        return isFatherSide;
+    }
+
+    public boolean isMotherSide() {
+        return isMotherSide;
+    }
+
+    public boolean isMaleEvents() {
+        return isMaleEvents;
+    }
+
+    public boolean isFemaleEvents() {
+        return isFemaleEvents;
+    }
 }

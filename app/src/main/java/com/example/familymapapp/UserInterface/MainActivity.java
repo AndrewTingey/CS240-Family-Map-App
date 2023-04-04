@@ -1,20 +1,18 @@
-package com.example.familymapapp;
+package com.example.familymapapp.UserInterface;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 
+import com.example.familymapapp.R;
 import com.example.familymapapp.cache.DataCache;
 
-import UserInterface.LoginFragment;
-import UserInterface.MapsFragment;
+import com.example.familymapapp.UserInterface.LoginFragment;
+import com.example.familymapapp.UserInterface.MapsFragment;
 
 public class MainActivity extends AppCompatActivity implements LoginFragment.Listener {
     String authtoken = null;
@@ -25,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Retrieve clickCount from SharedPreferences if it exists
+        // Retrieve authtoken from savedinstancestate if it exists
         SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
         //authtoken = sharedPreferences.getString(AUTHTOKEN_KEY, null);
         authtoken = null;
@@ -65,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
                 .replace(R.id.fragmentFrameLayout, fragment)
                 .commit();
     }
-
 
     @Override
     protected void onStop() {

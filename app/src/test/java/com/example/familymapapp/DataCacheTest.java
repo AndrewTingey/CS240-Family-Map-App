@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import Model.Person;
-import UserInterface.LoginFragment;
+import com.example.familymapapp.UserInterface.LoginFragment;
 
 public class DataCacheTest extends LoginFragment {
     private final Set<Person> fatherSideMales = new HashSet<>();

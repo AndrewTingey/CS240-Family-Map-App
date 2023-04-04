@@ -1,4 +1,4 @@
-package UserInterface;
+package com.example.familymapapp.UserInterface;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.example.familymapapp.R;
 import com.example.familymapapp.cache.DataCache;
+import com.example.familymapapp.cache.SettingsCache;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -107,9 +108,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     }
 
     private void drawAllLines(Event event) {
-        boolean spouseLines = false;
-        boolean familyTreeLines = false;
-        boolean lifeStoryLines = true;
+        SettingsCache settingsCache = SettingsCache.getInstance();
+        boolean spouseLines = settingsCache.isSpouseLines();
+        boolean familyTreeLines = settingsCache.isFamilyTreeLines();
+        boolean lifeStoryLines = settingsCache.isLifeStoryLines();
 
         if (spouseLines) {
             Person spouse = DataCache.getInstance().getSpouseByID(event.getPersonID());

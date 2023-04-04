@@ -10,3 +10,10 @@ Notes from class 3/28:
         (you can use a empty view between to set a line)
 
     After leaving settings, call GoogleMap.clear() and reload lines and markers
+
+Todo:
+    write PersonEvent.xml file and implement Search Activity
+    be able to switch from activities everywhere
+
+Notes from class:
+    datacache.GetspouseByID() does not need a instance variable

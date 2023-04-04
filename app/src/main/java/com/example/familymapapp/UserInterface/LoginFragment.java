@@ -1,5 +1,6 @@
-package UserInterface;
+package com.example.familymapapp.UserInterface;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -68,6 +69,30 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
+
+
+        //vvv remove after testing settings and search
+        Button searchButton = view.findViewById(R.id.search_button);
+        Button settingsButton = view.findViewById(R.id.settings_button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.println(Log.INFO, LOG_KEY, "SearchButton pressed");
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.println(Log.INFO, LOG_KEY, "Settings Button pressed");
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        //^^^ remove after testing settings and search
 
         serverHostNumber = view.findViewById(R.id.serverHostField); serverHostNumber.setText("10.0.2.2");
         serverPortNumber = view.findViewById(R.id.serverPortField); serverPortNumber.setText("8080");
