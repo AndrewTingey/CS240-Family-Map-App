@@ -17,6 +17,8 @@ public class RegisterTask implements Runnable {
     private RegisterRequest request;
     private String URL;
     private static final String SUCCESS_KEY = "SuccessKey";
+    private static final String MESSAGE_KEY = "MessageKey";
+    private static final String AUTHTOKEN_KEY = "AuthtokenKey";
 
     public RegisterTask(Handler registerButtonHandler, String serverHost, String serverPort, RegisterRequest request) {
         this.registerButtonHandler = registerButtonHandler;
@@ -29,6 +31,8 @@ public class RegisterTask implements Runnable {
         Message message = Message.obtain();
         Bundle messageBundle = new Bundle();
         messageBundle.putBoolean(SUCCESS_KEY, r.isSuccess());
+        messageBundle.putString(MESSAGE_KEY, r.getMessage());
+        messageBundle.putString(AUTHTOKEN_KEY, r.getAuthtoken());
 
         message.setData(messageBundle);
         registerButtonHandler.sendMessage(message);

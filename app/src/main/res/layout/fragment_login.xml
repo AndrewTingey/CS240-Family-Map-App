@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:layout_margin="16dp"
     android:stretchColumns="3"
-    tools:context="UserInterface.Login">
+    android:id="@+id/loginFragment"
+    tools:context="UserInterface.LoginFragment">
     <TableRow>
         <TextView
             android:layout_height="wrap_content"
@@ -109,20 +110,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_span="1"
+            android:id="@+id/genderButtons"
             android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/maleButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="onGenderButtonClicked"
                 android:text="@string/male" />
 
             <RadioButton
                 android:id="@+id/femaleButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="onGenderButtonClicked"
                 android:text="@string/female" />
         </RadioGroup>
     </TableRow>

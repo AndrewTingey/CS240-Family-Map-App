@@ -44,6 +44,8 @@ public class DataCache {
             }
         } };
     private final Set<String> eventTypes = new HashSet<>();
+    private final Map<String, Event> eventByID = new HashMap<>();
+    private final Map<String, Person> spouseByID = new HashMap<>();
     private Person user;
 
     //immediate family
@@ -61,10 +63,12 @@ public class DataCache {
         instance = getInstance();
         this.authtoken = authtoken;
         for (Person person : people) {
+            spouseByID.put(person.getSpouseID(), person);
             peopleByID.put(person.getPersonID(), person);
         }
         this.user = peopleByID.get(userID);
         for (Event event : events) {
+            eventByID.put(event.getEventID(), event);
             SortedSet<Event> eventList = eventsByPersonID.get(event.getPersonID());
             if (eventList == null) {
                 eventList = new TreeSet<>(eventComparator);
@@ -156,16 +160,17 @@ public class DataCache {
         this.authtoken = authtoken;
     }
 
-    public Map<String, Person> getPeopleByID() {
-        return peopleByID;
+    public Person getPeopleByID(String personID) {
+        return peopleByID.get(personID);
     }
 
     public Map<String, List<Person>> getChildrenByParentID() {
         return childrenByParentID;
     }
 
-    public Map<String, SortedSet<Event>> getEventsByPersonID() {
-        return eventsByPersonID;
+    public SortedSet<Event> getEventsByPersonID(String personID) {
+        SortedSet<Event> toReturn = eventsByPersonID.get(personID);
+        return eventsByPersonID.get(personID);
     }
 
     public Comparator<Event> getEventComparator() {
@@ -214,5 +219,13 @@ public class DataCache {
 
     public Set<Person> getMotherSideFemales() {
         return motherSideFemales;
+    }
+
+    public Event getEventByID(String eventID) {
+        return eventByID.get(eventID);
+    }
+
+    public Person getSpouseByID(String personID) {
+        return spouseByID.get(personID);
     }
 }
