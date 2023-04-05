@@ -1,5 +1,7 @@
 package com.example.familymapapp.cache;
 
+import android.util.Log;
+
 import java.util.*;
 
 import Model.*;
@@ -7,6 +9,7 @@ import Model.*;
 public class DataCache {
     private static String BIRTH_STRING = "birth";
     private static String DEATH_STRING = "death";
+    private static String LOG_KEY = "DataCache";
     private static DataCache instance;
     //if authtoken is null, user is not logged in
     private String authtoken = null;
@@ -17,7 +20,6 @@ public class DataCache {
         @Override
         //a negative integer, zero, or a positive integer as the first argument is less than, equal to, or greater than the second.
         public int compare(Event event, Event t1) {
-            //todo
             //birth events first, death events last
             if (event.getEventType().equalsIgnoreCase(BIRTH_STRING)) {
                 if (!t1.getEventType().equalsIgnoreCase(BIRTH_STRING)) {
@@ -162,8 +164,8 @@ public class DataCache {
         return peopleByID.get(personID);
     }
 
-    public Map<String, List<Person>> getChildrenByParentID() {
-        return childrenByParentID;
+    public List<Person> getChildrenByParentID(String parentID) {
+        return childrenByParentID.get(parentID);
     }
 
     public SortedSet<Event> getEventsByPersonID(String personID) {
@@ -226,5 +228,36 @@ public class DataCache {
     public Person getSpouseByID(String personID) {
         Person person = getPeopleByID(personID);
         return getPeopleByID(person.getSpouseID());
+    }
+
+    public List<Person> searchPerson(String searchString) {
+        searchString = searchString.toLowerCase();
+        List<Person> toReturn = new ArrayList<>();
+        Iterator i = peopleByID.values().iterator();
+        while(i.hasNext()) {
+            Person person = (Person) i.next();
+            //Log.println(Log.INFO, LOG_KEY, "Person iterated: " + person.getFirstName());
+            if (person.getFirstName().toLowerCase().contains(searchString)) {
+                toReturn.add(person);
+            } else if (person.getFirstName().toLowerCase().contains(searchString)) {
+                toReturn.add(person);
+            }
+        }
+        return toReturn;
+    }
+    public List<Event> searchEvent(String searchString) {
+        searchString = searchString.toLowerCase();
+        List<Event> toReturn = new ArrayList<>();
+        Iterator i = eventByID.values().iterator();
+        while(i.hasNext()) {
+            Event event = (Event) i.next();
+            Log.println(Log.INFO, LOG_KEY, "event iterated: " + event.getEventID());
+            if (event.getCity().toLowerCase().contains(searchString)) {
+                toReturn.add(event);
+            } else if (event.getCountry().toLowerCase().contains(searchString)) {
+                toReturn.add(event);
+            }
+        }
+        return toReturn;
     }
 }

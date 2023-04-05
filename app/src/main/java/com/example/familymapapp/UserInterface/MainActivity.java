@@ -56,12 +56,13 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
         //switch views here
         this.authtoken = authtoken;
 
-        FragmentManager fragmentManager = this.getSupportFragmentManager();
-        Fragment fragment = new MapsFragment();
+        //TODO COMMENTED OUT FOR CACHING DATA AND DEBUGGING
+        //FragmentManager fragmentManager = this.getSupportFragmentManager();
+        //Fragment fragment = new MapsFragment();
 
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragmentFrameLayout, fragment)
-                .commit();
+        //fragmentManager.beginTransaction()
+                //.replace(R.id.fragmentFrameLayout, fragment)
+                //.commit();
     }
 
     @Override

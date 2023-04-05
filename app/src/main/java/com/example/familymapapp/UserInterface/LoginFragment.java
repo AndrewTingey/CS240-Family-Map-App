@@ -73,7 +73,7 @@ public class LoginFragment extends Fragment {
 
         //vvv remove after testing settings and search
         Button searchButton = view.findViewById(R.id.search_button);
-        Button settingsButton = view.findViewById(R.id.settings_button);
+        Button personButton = view.findViewById(R.id.person_button);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,11 +83,12 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        settingsButton.setOnClickListener(new View.OnClickListener() {
+        personButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.println(Log.INFO, LOG_KEY, "Settings Button pressed");
-                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                Log.println(Log.INFO, LOG_KEY, "Person Button pressed");
+                Intent intent = new Intent(getActivity(), PersonActivity.class);
+                intent.putExtra(PersonActivity.PERSON_ID_KEY, "testing0f608b7e-");
                 startActivity(intent);
             }
         });

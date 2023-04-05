@@ -255,5 +255,4 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             default: return BitmapDescriptorFactory.HUE_CYAN;
         }
     }
-
 }

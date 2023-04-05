@@ -12,8 +12,8 @@ Notes from class 3/28:
     After leaving settings, call GoogleMap.clear() and reload lines and markers
 
 Todo:
-    write PersonEvent.xml file and implement Search Activity
+    make Search Activity search bar prettier
     be able to switch from activities everywhere
+    write event activity
 
-Notes from class:
-    datacache.GetspouseByID() does not need a instance variable
+
