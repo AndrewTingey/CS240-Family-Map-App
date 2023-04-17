@@ -3,6 +3,7 @@ package com.example.familymapapp.UserInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
@@ -31,6 +32,9 @@ import Model.Person;
 import Requests.RegisterRequest;
 
 public class LoginFragment extends Fragment {
+    public LoginFragment(Listener listener) {
+        this.listener = listener;
+    }
     private Listener listener;
 
     public interface Listener {
@@ -62,38 +66,17 @@ public class LoginFragment extends Fragment {
     Button loginButton;
     Button registerButton;
 
-    public LoginFragment(Listener listener) {
-        this.listener = listener;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(false);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
-
-        //vvv remove after testing settings and search
-        Button searchButton = view.findViewById(R.id.search_button);
-        Button personButton = view.findViewById(R.id.person_button);
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.println(Log.INFO, LOG_KEY, "SearchButton pressed");
-                Intent intent = new Intent(getActivity(), SearchActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        personButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.println(Log.INFO, LOG_KEY, "Person Button pressed");
-                Intent intent = new Intent(getActivity(), PersonActivity.class);
-                intent.putExtra(PersonActivity.PERSON_ID_KEY, "testing0f608b7e-");
-                startActivity(intent);
-            }
-        });
-
-        //^^^ remove after testing settings and search
+        setHasOptionsMenu(false);
 
         serverHostNumber = view.findViewById(R.id.serverHostField); serverHostNumber.setText("10.0.2.2");
         serverPortNumber = view.findViewById(R.id.serverPortField); serverPortNumber.setText("8080");

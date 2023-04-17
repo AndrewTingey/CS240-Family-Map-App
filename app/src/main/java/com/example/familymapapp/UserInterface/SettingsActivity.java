@@ -1,5 +1,6 @@
 package com.example.familymapapp.UserInterface;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -61,7 +62,10 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.println(Log.INFO, LOG_TAG, "LOGOUT BUTTON PRESSED");
-                Log.println(Log.INFO, LOG_TAG, "Life story is set to: " + lifeStory.isChecked());
+                DataCache.getInstance().logout();
+                Intent intent = new Intent(getBaseContext(), MainActivity.class); //why get base context?
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
             }
         });
     }

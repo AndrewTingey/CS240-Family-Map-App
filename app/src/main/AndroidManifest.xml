@@ -18,19 +18,27 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".UserInterface.EventActivity"
+            android:exported="false"
+            android:parentActivityName=".UserInterface.MainActivity"/>
+        <activity
             android:name=".UserInterface.PersonActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".UserInterface.MainActivity" />
         <activity
             android:name=".UserInterface.TestActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".UserInterface.MainActivity" />
         <activity
             android:name=".UserInterface.SettingsActivity"
             android:exported="false"
-            android:label="@string/title_activity_settings" />
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".UserInterface.MainActivity" />
         <activity
             android:name=".UserInterface.SearchActivity"
             android:exported="false"
-            android:label="@string/title_activity_search" />
+            android:label="@string/title_activity_search"
+            android:parentActivityName=".UserInterface.MainActivity" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 

@@ -3,6 +3,7 @@ package com.example.familymapapp.UserInterface;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,10 @@ import android.widget.Toast;
 
 import com.example.familymapapp.R;
 import com.example.familymapapp.cache.DataCache;
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.Iconify;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
+import com.joanzapata.iconify.fonts.FontAwesomeModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +31,7 @@ import Model.Person;
 
 public class PersonActivity extends AppCompatActivity {
     public static final String PERSON_ID_KEY = "PersonIDKey";
+    public static final String SELECTED_EVENT_KEY = "EventIDKey";
     private List<Event> eventList = new ArrayList<>();
     private List<Person> personList = new ArrayList<>();
     private String firstName;
@@ -73,6 +79,8 @@ public class PersonActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person);
+
+        Iconify.with(new FontAwesomeModule());
 
         Intent intent = getIntent();
         String personID = intent.getStringExtra(PERSON_ID_KEY);
@@ -193,12 +201,18 @@ public class PersonActivity extends AppCompatActivity {
             description.setText(String.format("%s %s", associatedPerson.getFirstName(), associatedPerson.getLastName()));
 
             ImageView icon = eventItemView.findViewById(R.id.mapEventImage);
-            icon.setImageResource(R.drawable.exclamation_icon); //TODO CHANGE ICON TO MARKER
+
+            int color = MapsFragment.getEventColorInt(event.getEventType());
+            Drawable genderIcon = new IconDrawable(getBaseContext(), FontAwesomeIcons.fa_map_marker).colorRes(color).sizeDp(40);
+            icon.setImageDrawable(genderIcon);
 
             eventItemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(PersonActivity.this, "Event Selected: " + eventList.get(childPosition).getEventID(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(PersonActivity.this, EventActivity.class);
+                    intent.putExtra(SELECTED_EVENT_KEY, eventList.get(childPosition).getEventID());
+                    startActivity(intent);
                 }
             });
         }
@@ -216,9 +230,13 @@ public class PersonActivity extends AppCompatActivity {
             ImageView icon = personItemView.findViewById(R.id.mapEventImage);
 
             if (person.getGender().equalsIgnoreCase("M")) {
-                icon.setImageResource(R.drawable.male_icon);
+                Drawable genderIcon = new IconDrawable(getBaseContext(), FontAwesomeIcons.fa_male).
+                        colorRes(R.color.blue).sizeDp(40);
+                icon.setImageDrawable(genderIcon);
             } else {
-                icon.setImageResource(R.drawable.female_icon);
+                Drawable genderIcon = new IconDrawable(getBaseContext(), FontAwesomeIcons.fa_female).
+                        colorRes(R.color.pink).sizeDp(40);
+                icon.setImageDrawable(genderIcon);
             }
 
             personItemView.setOnClickListener(new View.OnClickListener() {

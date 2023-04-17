@@ -260,4 +260,9 @@ public class DataCache {
         }
         return toReturn;
     }
+
+    public void logout() {
+        instance = null;
+        authtoken = null;
+    }
 }

@@ -1,19 +1,31 @@
-
-Notes from class 3/28:
-    you can make a view scrollable by nesting the layout in a scrollview .xml
     how do you make enter take the user to the next editText view
-
-    Map fragment - relative view
-    Search fragment - linear view
-    settings fragment - linear view with linear and relative within
-    person details fragment - linear layout with expandable view in bottom
-        (you can use a empty view between to set a line)
-
-    After leaving settings, call GoogleMap.clear() and reload lines and markers
 
 Todo:
     make Search Activity search bar prettier
-    be able to switch from activities everywhere
-    write event activity
+    change all keys to public and use only once
+    PersonActivity events list is filtered on settings
+    SearchActivity events are filtered on settings
+    SearchActivity people are not filtered on settings,
+    Check - SearchActivity searches firstname, lastname, country, city, eventtype, AND year
+    write JUnit tests for:
+        ServerProxy class:
+            Login method
+            Registering a new user
+            Retrieving people related to a logged in/registered user
+            Retrieving events related to a logged in/registered user
+        Model classes:
+            ● Calculates family relationships (i.e., spouses, parents, children)
+            ● Filters events according to the current filter settings
+            ● Chronologically sorts a person’s individual events (birth first, death last, etc.)
+            ● Correctly searches for people and events (for your Search Activity)
+
+    events in order in person activity
+    filter events on map fragment
+    sheila and spouse don't show up at all
+    check flags set on up arrow all, should be the same
+    Case insensitive search activity
+
+
+
 
 

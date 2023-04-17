@@ -19,35 +19,44 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/mapEventImage"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_alignParentLeft="true"
-            android:src="@drawable/exclamation_icon"
-            >
-        </ImageView>
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_toRightOf="@+id/mapEventImage"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <TextView
-                android:id="@+id/mapNameTextBox"
+            android:layout_height="100dp"
+            android:clickable="true"
+            android:id="@+id/infoBox">
+
+            <ImageView
+                android:id="@+id/mapEventImage"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_alignParentLeft="true"
+                android:src="@drawable/exclamation_icon"
+                >
+            </ImageView>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_toRightOf="@+id/mapEventImage"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:textSize="30dp"
-                android:text="@string/mapNoMarkerClicked">
-            </TextView>
-            <TextView
-                android:id="@+id/mapInfoTextBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:textSize="25dp"
-                android:text="@string/mapClickMarkerPrompt">
-            </TextView>
+                android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/mapNameTextBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:textSize="30dp"
+                    android:text="@string/mapNoMarkerClicked">
+                </TextView>
+                <TextView
+                    android:id="@+id/mapInfoTextBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:textSize="25dp"
+                    android:text="@string/mapClickMarkerPrompt">
+                </TextView>
+            </LinearLayout>
+
         </LinearLayout>
+
     </RelativeLayout>
 </RelativeLayout>

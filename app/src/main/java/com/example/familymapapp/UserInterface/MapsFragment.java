@@ -4,15 +4,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.familymapapp.R;
@@ -25,8 +29,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-
-import org.w3c.dom.Text;
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.Iconify;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
+import com.joanzapata.iconify.fonts.FontAwesomeModule;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,8 +45,83 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     private GoogleMap map;
     private View view;
     private final String LOG_TAG = "MapsFragment";
+    private final String HAS_MENU_KEY  = "MenuKey";
+    private Event selectedEvent = null;
+    private boolean hasMenu = false;
+    private Listener listener;
 
-    public MapsFragment() {
+
+    public interface Listener {
+        void notifyDone(String authtoken);
+    }
+    public void registerListener(Listener listener) {
+        this.listener = listener;
+    }
+
+    public MapsFragment(Listener listener) {
+        this.listener = listener;
+    }
+
+    public MapsFragment(Listener listener, Event selectedEvent) {
+        this.listener = listener;
+        setSelectedEvent(selectedEvent);
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        setHasOptionsMenu(hasMenu);
+
+        //check if logged out
+        if (DataCache.getInstance().getAuthtoken() == null) {
+            Log.println(Log.INFO, LOG_TAG, "Notifying Done");
+            listener.notifyDone(null);
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.main_menu, menu);
+
+        MenuItem settingsMenuItem = menu.findItem(R.id.settingsMenuItem);
+        settingsMenuItem.setIcon(new IconDrawable(getContext(),
+                FontAwesomeIcons.fa_gear).colorRes(R.color.white)
+                .actionBarSize());
+
+        MenuItem searchMenuItem = menu.findItem(R.id.searchMenuItem);
+        searchMenuItem.setIcon(new IconDrawable(getContext(),
+                FontAwesomeIcons.fa_search).colorRes(R.color.white)
+                .actionBarSize());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Log.println(Log.INFO, LOG_TAG, "MENU ITEM SELECTEd FROM maps");
+        if (item.getItemId() == android.R.id.home) {
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        } else if (item.getItemId() == R.id.settingsMenuItem) {
+            Log.println(Log.INFO, LOG_TAG, "Settings Clicked");
+            Intent intent = new Intent(getContext(), SettingsActivity.class);
+            startActivity(intent);
+        } else if (item.getItemId() == R.id.searchMenuItem) {
+            Log.println(Log.INFO, LOG_TAG, "Search Clicked");
+            Intent intent = new Intent(getContext(), SearchActivity.class);
+            startActivity(intent);
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            hasMenu = getArguments().getBoolean(HAS_MENU_KEY); //todo make login fragment pass a false here, EventActivity
+        }
+        setHasOptionsMenu(hasMenu);
     }
 
     @Override
@@ -51,19 +132,82 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         super.onCreateView(inflater, container, savedInstanceState);
         this.view = inflater.inflate(R.layout.fragment_maps, container, false);
 
+        Iconify.with(new FontAwesomeModule());
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        //set default image
+        ImageView imageView = view.findViewById(R.id.mapEventImage);
+        Drawable safariIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_safari).
+                colorRes(R.color.black).sizeDp(40);
+        imageView.setImageDrawable(safariIcon);
+
+        //make info box clickable
+        LinearLayout infoBox = view.findViewById(R.id.infoBox);
+        infoBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (selectedEvent != null) {
+                    Log.println(Log.INFO, LOG_TAG, "INFO BOX PRESSED, with event: " + selectedEvent.getEventID());
+                    //switch to person activity
+                    Intent intent = new Intent(getActivity(), PersonActivity.class);
+                    intent.putExtra(PersonActivity.PERSON_ID_KEY, selectedEvent.getPersonID());
+                    startActivity(intent);
+                }
+            }
+        });
         return view;
     }
-
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
         map.setOnMapLoadedCallback(this);
         setMarkers();
+        if (this.selectedEvent != null) {
+            animateCamera();
+        }
     }
 
+    public void setSelectedEvent(Event selectedEvent) {
+        this.selectedEvent = selectedEvent;
+    }
+
+    public void animateCamera() {
+        LatLng pos = new LatLng(selectedEvent.getLatitude(), selectedEvent.getLongitude());
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(pos, (float) 1.80);
+        map.animateCamera(cameraUpdate);
+
+        Person person = DataCache.getInstance().getPeopleByID(selectedEvent.getPersonID());
+        Log.println(Log.INFO, LOG_TAG, "Event clicked: " + person.getGender());
+
+        TextView nameText = view.findViewById(R.id.mapNameTextBox);
+        nameText.setText(String.format("%s %s", person.getFirstName(), person.getLastName()));
+
+        TextView infoText = view.findViewById(R.id.mapInfoTextBox);
+        infoText.setText(String.format("%s: %s (%d)", selectedEvent.getEventType(), selectedEvent.getCity(), selectedEvent.getYear()));
+
+        ImageView imageView = view.findViewById(R.id.mapEventImage);
+        if (person.getGender().equalsIgnoreCase("M")) {
+            //set to male
+            Drawable genderIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_male).
+                    colorRes(R.color.blue).sizeDp(40);
+            imageView.setImageDrawable(genderIcon);
+        } else if (person.getGender().equalsIgnoreCase("F")) {
+            //set to female
+            Drawable genderIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_female).
+                    colorRes(R.color.pink).sizeDp(40);
+            imageView.setImageDrawable(genderIcon);
+            //imageView.setImageResource(R.drawable.female_icon);
+        } else {
+            //display ! with error
+            Drawable safariIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_safari).
+                    colorRes(R.color.black).sizeDp(40);
+            imageView.setImageDrawable(safariIcon);
+        }
+        map.clear();
+        setMarkers();
+        drawAllLines(selectedEvent);
+    }
     @Override
     public void onMapLoaded() {
 
@@ -72,34 +216,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             public boolean onMarkerClick(Marker marker) {
                 Log.println(Log.INFO, LOG_TAG, "Marker clicked: " + marker.toString());
                 if (marker != null) {
-                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(marker.getPosition(), (float) 1.80);
-                    map.animateCamera(cameraUpdate);
                     String eventID = (String) marker.getTag();
-                    Event event = DataCache.getInstance().getEventByID(eventID);
-                    Person person = DataCache.getInstance().getPeopleByID(event.getPersonID());
-                    Log.println(Log.INFO, LOG_TAG, "Event clicked: " + person.getGender());
-
-                    TextView nameText = view.findViewById(R.id.mapNameTextBox);
-                    nameText.setText(String.format("%s %s", person.getFirstName(), person.getLastName()));
-
-                    TextView infoText = view.findViewById(R.id.mapInfoTextBox);
-                    infoText.setText(String.format("%s: %s (%d)", event.getEventType(), event.getCity(), event.getYear()));
-
-                    ImageView imageView = view.findViewById(R.id.mapEventImage);
-                    if (person.getGender().equalsIgnoreCase("M")) {
-                        //set to male
-                        imageView.setImageResource(R.drawable.male_icon);
-                    } else if (person.getGender().equalsIgnoreCase("F")) {
-                        //set to female
-                        imageView.setImageResource(R.drawable.female_icon);
-                    } else {
-                        //display ! with error
-                        imageView.setImageResource(R.drawable.exclamation_icon);
-                    }
-
-                    map.clear();
-                    setMarkers();
-                    drawAllLines(event);
+                    setSelectedEvent(DataCache.getInstance().getEventByID(eventID));
+                    animateCamera();
                     return true;
                 }
                 return false;
@@ -148,7 +267,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         if (lifeStoryLines) {
             SortedSet<Event> lifeEvents = DataCache.getInstance().getEventsByPersonID(event.getPersonID());
             Event e1 = null;
-            Event e2 = null;
+            Event e2;
             for (Event lifeEvent : lifeEvents) {
                 e2 = lifeEvent;
                 if (e1 != null) {
@@ -225,18 +344,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             if (personToAdd == null) { continue; }
             //add this persons events to map
             String personID = personToAdd.getPersonID();
-            Log.println(Log.INFO, LOG_TAG, "Adding person: " + personID);
+            //Log.println(Log.INFO, LOG_TAG, "Adding person: " + personID);
             SortedSet<Event> eventsToDisplay = data.getEventsByPersonID(personToAdd.getPersonID());
             for (Event event : eventsToDisplay) {
                 float eventColor = getEventColor(event.getEventType());
                 Marker marker = map.addMarker(new MarkerOptions().position(new
                         LatLng(event.getLatitude(), event.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(eventColor)));
                 marker.setTag(event.getEventID());
-                Log.println(Log.INFO, LOG_TAG, "EVENT ADDED: " + event.toString());
+                //Log.println(Log.INFO, LOG_TAG, "EVENT ADDED: " + event.toString());
             }
         }
     }
-    private float getEventColor(String eventType) {
+
+    public static float getEventColor(String eventType) {
         Set<String> types = DataCache.getInstance().getEventTypes();
         int index = 0;
         for (String entry:types) {
@@ -253,6 +373,26 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             case 6: return BitmapDescriptorFactory.HUE_MAGENTA;
             case 7: return BitmapDescriptorFactory.HUE_AZURE;
             default: return BitmapDescriptorFactory.HUE_CYAN;
+        }
+    }
+
+    public static int getEventColorInt(String eventType) {
+        Set<String> types = DataCache.getInstance().getEventTypes();
+        int index = 0;
+        for (String entry:types) {
+            if (entry.equalsIgnoreCase(eventType)) break;
+            index++;
+        }
+        switch (index) {
+            case 0: return R.color.Red;
+            case 1: return R.color.Blue;
+            case 2: return R.color.Green;
+            case 3: return R.color.Orange;
+            case 4: return R.color.Yellow;
+            case 5: return R.color.Violet;
+            case 6: return R.color.Magenta;
+            case 7: return R.color.Azure; // what is azure
+            default: return R.color.Cyan; //fix this color
         }
     }
 }

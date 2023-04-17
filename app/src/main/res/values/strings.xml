@@ -70,5 +70,7 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="family">FAMILY</string>
     <string name="life_events">LIFE EVENTS</string>
+    <string name="settingsMenu">Settings</string>
+    <string name="searchMenu">Search</string>
 
 </resources>

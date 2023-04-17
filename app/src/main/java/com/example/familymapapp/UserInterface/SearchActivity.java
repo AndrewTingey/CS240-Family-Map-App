@@ -1,6 +1,8 @@
 package com.example.familymapapp.UserInterface;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,6 +21,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.familymapapp.R;
 import com.example.familymapapp.cache.DataCache;
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.Iconify;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
+import com.joanzapata.iconify.fonts.FontAwesomeModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +46,9 @@ public class SearchActivity extends AppCompatActivity {
         EditText searchBar = findViewById(R.id.search_bar);
         searchBar.addTextChangedListener(mTextWatcher);
 
-        RecyclerView recyclerView = findViewById(R.id.recycler_view); //todo need to add tools:context to .xml
+        Iconify.with(new FontAwesomeModule());
+
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
     }
 
@@ -61,7 +69,7 @@ public class SearchActivity extends AppCompatActivity {
         @NonNull
         @Override
         public SearchActivityViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = getLayoutInflater().inflate(R.layout.person_event_item, parent, false); // todo write personEventItem.xml
+            View view = getLayoutInflater().inflate(R.layout.person_event_item, parent, false);
             return new SearchActivityViewHolder(view, viewType);
         }
 
@@ -95,7 +103,7 @@ public class SearchActivity extends AppCompatActivity {
 
             itemView.setOnClickListener(this);
 
-            if (viewType == EVENT_KEY) { //todo write person/event_item.xml formatted with these @+id
+            if (viewType == EVENT_KEY) {
                 title = itemView.findViewById(R.id.eventTitle);
                 description = itemView.findViewById(R.id.eventDescription);
                 image = itemView.findViewById(R.id.mapEventImage);
@@ -106,14 +114,16 @@ public class SearchActivity extends AppCompatActivity {
             }
         }
 
-        private void bind(Event event) { //TODO format the strings here and there v
+        private void bind(Event event) {
             Log.println(Log.INFO, LOG_KEY, "Binding event: " + event);
             this.event = event;
             title.setText(String.format("%s: %s, %s (%d)", event.getEventType(), event.getCity(), event.getCountry(), event.getYear()));
             Person associatedPerson = DataCache.getInstance().getPeopleByID(event.getPersonID());
             description.setText(String.format("%s %s", associatedPerson.getFirstName(), associatedPerson.getLastName()));
 
-            image.setImageResource(R.drawable.exclamation_icon);
+            int color = MapsFragment.getEventColorInt(event.getEventType());
+            Drawable eventIcon = new IconDrawable(getBaseContext(), FontAwesomeIcons.fa_map_marker).colorRes(color).sizeDp(40); //why getbase context again?
+            image.setImageDrawable(eventIcon);
         }
 
         private void bind(Person person) {
@@ -123,18 +133,21 @@ public class SearchActivity extends AppCompatActivity {
             description.setText(""); // blank space babay
 
             if (person.getGender().equalsIgnoreCase("M")) {
-                image.setImageResource(R.drawable.male_icon);
+                Drawable genderIcon = new IconDrawable(getBaseContext(), FontAwesomeIcons.fa_male).colorRes(R.color.blue).sizeDp(40); //why getbase context again?
+                image.setImageDrawable(genderIcon);
             } else {
-                image.setImageResource(R.drawable.female_icon);
+                Drawable genderIcon = new IconDrawable(getBaseContext(), FontAwesomeIcons.fa_female).colorRes(R.color.pink).sizeDp(40); //why getbase context again?
+                image.setImageDrawable(genderIcon);
             }
         }
 
         @Override
         public void onClick(View view) {
             if (viewType == EVENT_KEY) {
-                //todo switch to event activity
-
-                Toast.makeText(SearchActivity.this, String.format("Event clicked: %s", event.getEventID()), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(SearchActivity.this, String.format("Event clicked: %s", event.getEventID()), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(SearchActivity.this, EventActivity.class);
+                intent.putExtra(EventActivity.SELECTED_EVENT_KEY, event.getEventID());
+                startActivity(intent);
             } else {
                 //Toast.makeText(SearchActivity.this, String.format("Person clicked: %s", person.getFirstName()), Toast.LENGTH_SHORT).show();
                 //switch to person activity
