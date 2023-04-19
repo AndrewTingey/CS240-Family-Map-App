@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
             }
         }
     }
-
     private Fragment createFirstFragment() {
         Fragment fragment;
         if (authtoken == null) {
@@ -111,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
                 .replace(R.id.fragmentFrameLayout, fragment)
                 .commit();
     }
-
     @Override
     protected void onStop() {
         super.onStop();

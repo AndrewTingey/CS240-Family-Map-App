@@ -70,11 +70,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         super.onResume();
         setHasOptionsMenu(hasMenu);
 
-        Log.println(Log.INFO, LOG_TAG, "MAP: " + map);
         //check if logged out
         if (DataCache.getInstance().getAuthtoken() == null) {
             listener.notifyDone(null);
         }
+        Log.println(Log.INFO, LOG_TAG, "MAP: " + map);
         if (map != null && selectedEvent != null) {
             Log.println(Log.INFO, LOG_TAG, "SETTING MARKERS");
             animateCamera();
