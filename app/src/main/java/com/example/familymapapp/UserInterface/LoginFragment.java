@@ -80,8 +80,8 @@ public class LoginFragment extends Fragment {
 
         serverHostNumber = view.findViewById(R.id.serverHostField); serverHostNumber.setText("10.0.2.2");
         serverPortNumber = view.findViewById(R.id.serverPortField); serverPortNumber.setText("8080");
-        username = view.findViewById(R.id.usernameField); username.setText("testing_andrew");
-        password = view.findViewById(R.id.passwordField); password.setText("pw123");
+        username = view.findViewById(R.id.usernameField); username.setText("sheila");
+        password = view.findViewById(R.id.passwordField); password.setText("parker");
         firstName = view.findViewById(R.id.firstNameField);
         lastName = view.findViewById(R.id.lastNameField);
         email = view.findViewById(R.id.emailField);
@@ -129,7 +129,7 @@ public class LoginFragment extends Fragment {
                         String personID = bundle.getString(PERSONID_KEY);
                         String errorMessage = bundle.getString(MESSAGE_KEY);
                         if (success) {
-                            Log.println(Log.INFO, LOG_KEY, "Success");
+                            //Log.println(Log.INFO, LOG_KEY, "Success");
                             Handler dataSyncHandler = new Handler(Looper.getMainLooper()){
                                 @Override
                                 public void handleMessage(Message message1) {

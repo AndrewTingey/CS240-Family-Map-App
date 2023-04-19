@@ -3,6 +3,7 @@ package com.example.familymapapp.UserInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
@@ -76,5 +77,18 @@ public class SettingsActivity extends AppCompatActivity {
         SettingsCache settings = SettingsCache.getInstance();
         settings.setSettings(lifeStory.isChecked(), familyTree.isChecked(), spouseLines.isChecked(), fatherSide.isChecked(), motherSide.isChecked(), maleEvents.isChecked(), femaleEvents.isChecked());
         Log.println(Log.INFO, LOG_TAG, "Life Story Lines was saved from onStop() as: " + lifeStory.isChecked());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

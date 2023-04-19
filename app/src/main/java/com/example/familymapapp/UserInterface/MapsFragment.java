@@ -73,11 +73,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
         //check if logged out
         if (DataCache.getInstance().getAuthtoken() == null) {
-            Log.println(Log.INFO, LOG_TAG, "Notifying Done");
             listener.notifyDone(null);
         }
     }
-
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -162,10 +160,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
         map.setOnMapLoadedCallback(this);
-        setMarkers();
+        //setMarkers(); moevd to on map loaded
         if (this.selectedEvent != null) {
             animateCamera();
         }
+        Log.println(Log.INFO, LOG_TAG, "onMapReadyCalleed");
     }
 
     public void setSelectedEvent(Event selectedEvent) {
@@ -210,7 +209,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     }
     @Override
     public void onMapLoaded() {
-
+        Log.println(Log.INFO, LOG_TAG, "onMapLoaded called");
+        setMarkers();
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -285,10 +285,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         Event firstEvent = lifeEvents.first();
 
         String fatherID = DataCache.getInstance().getPeopleByID(personID).getFatherID();
-        Event fatherBirthEvent = drawFamilyLines(fatherID, width - 4);
+        Event fatherBirthEvent = drawFamilyLines(fatherID, width / 2);
 
         String motherID = DataCache.getInstance().getPeopleByID(personID).getMotherID();
-        Event motherBirthEvent = drawFamilyLines(motherID, width - 4);
+        Event motherBirthEvent = drawFamilyLines(motherID, width / 2);
 
         if (fatherBirthEvent != null) {
             drawSingleLine(firstEvent, fatherBirthEvent, Color.BLUE, width);
@@ -317,25 +317,34 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     private void setMarkers() {
         //CHECK SETTINGS FOR VALUES
         DataCache data = DataCache.getInstance();
-        boolean fatherSide = true;
-        boolean motherSide = true;
-        boolean maleEvents = true;
-        boolean femaleEvents = true;
+        SettingsCache settings = SettingsCache.getInstance();
+        boolean fatherSide = settings.isFatherSide();
+        boolean motherSide = settings.isMotherSide();
+        boolean maleEvents = settings.isMaleEvents();
+        boolean femaleEvents = settings.isFemaleEvents();
 
         Set<Person> peopleToAdd = new HashSet<>();
-        if (fatherSide) {
-            if (maleEvents) {
+        //add user and spouse always unconditionally
+        Person user = data.getUser();
+        peopleToAdd.add(user);
+        peopleToAdd.add(data.getPeopleByID(user.getSpouseID()));
+
+        //todo check this, might be redundant
+        //conditionally add ancestors
+        if (maleEvents) {
+            //peopleToAdd.addAll(data.getImmediateFamilyMales());
+            if (fatherSide) {
                 peopleToAdd.addAll(data.getFatherSideMales());
             }
-            if (femaleEvents) {
-                peopleToAdd.addAll(data.getFatherSideFemales());
-            }
-        }
-        if (motherSide) {
-            if (maleEvents) {
+            if (motherSide) {
                 peopleToAdd.addAll(data.getMotherSideMales());
             }
-            if (femaleEvents) {
+        } if (femaleEvents) {
+            //peopleToAdd.addAll(data.getImmediateFamilyFemales());
+            if (fatherSide) {
+                peopleToAdd.addAll(data.getFatherSideFemales());
+            }
+            if (motherSide) {
                 peopleToAdd.addAll(data.getMotherSideFemales());
             }
         }
@@ -347,11 +356,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             //Log.println(Log.INFO, LOG_TAG, "Adding person: " + personID);
             SortedSet<Event> eventsToDisplay = data.getEventsByPersonID(personToAdd.getPersonID());
             for (Event event : eventsToDisplay) {
-                float eventColor = getEventColor(event.getEventType());
-                Marker marker = map.addMarker(new MarkerOptions().position(new
-                        LatLng(event.getLatitude(), event.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(eventColor)));
-                marker.setTag(event.getEventID());
-                //Log.println(Log.INFO, LOG_TAG, "EVENT ADDED: " + event.toString());
+                if (data.isInFilters(event)) {
+                    float eventColor = getEventColor(event.getEventType());
+                    Marker marker = map.addMarker(new MarkerOptions().position(new
+                            LatLng(event.getLatitude(), event.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(eventColor)));
+                    marker.setTag(event.getEventID());
+                }
             }
         }
     }

@@ -3,29 +3,38 @@
 Todo:
     make Search Activity search bar prettier
     change all keys to public and use only once
-    PersonActivity events list is filtered on settings
-    SearchActivity events are filtered on settings
-    SearchActivity people are not filtered on settings,
-    Check - SearchActivity searches firstname, lastname, country, city, eventtype, AND year
     write JUnit tests for:
-        ServerProxy class:
-            Login method
-            Registering a new user
-            Retrieving people related to a logged in/registered user
-            Retrieving events related to a logged in/registered user
         Model classes:
             ● Calculates family relationships (i.e., spouses, parents, children)
             ● Filters events according to the current filter settings
             ● Chronologically sorts a person’s individual events (birth first, death last, etc.)
             ● Correctly searches for people and events (for your Search Activity)
 
-    events in order in person activity
-    filter events on map fragment
-    sheila and spouse don't show up at all
-    check flags set on up arrow all, should be the same
-    Case insensitive search activity
+Todo:
+    person activity duplicates spouse now
+    bug:
+        sheila parker -> blaine mcgary
+        sheila parker -> blaine mcgary, results in double spouse, father, mother
+    bug:
+        when leaving settings activity, the old markers remain until clicked away
 
 
+Done:
+    PersonActivity events list is filtered on settings - done
+    SearchActivity events are filtered on settings - done
+    SearchActivity people are not filtered on settings, - done
+    SearchActivity searches firstname, lastname, country, city, eventtype, AND year
+    JUnit tests for ServerProxy class:
+            ● Login method
+            ● Registering a new user
+            ● Retrieving people related to a logged in/registered user
+            ● Retrieving events related to a logged in/registered user
+
+    events in order in person activity - fixed
+    filter events on map fragment - fixed
+    sheila and spouse don't show up at all - fixed
+    check flags set on up arrow all, should be the same - fixed
+    Case insensitive search activity - fixed
 
 
 

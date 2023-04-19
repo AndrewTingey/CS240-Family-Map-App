@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -75,7 +76,7 @@ public class SearchActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull SearchActivityViewHolder holder, int position) {
-            Log.println(Log.INFO, LOG_KEY, "Logging position: " + position);
+            //Log.println(Log.INFO, LOG_KEY, "Logging position: " + position);
             if (position < personList.size()) {
                 holder.bind(personList.get(position));
             } else {
@@ -115,7 +116,7 @@ public class SearchActivity extends AppCompatActivity {
         }
 
         private void bind(Event event) {
-            Log.println(Log.INFO, LOG_KEY, "Binding event: " + event);
+            //Log.println(Log.INFO, LOG_KEY, "Binding event: " + event);
             this.event = event;
             title.setText(String.format("%s: %s, %s (%d)", event.getEventType(), event.getCity(), event.getCountry(), event.getYear()));
             Person associatedPerson = DataCache.getInstance().getPeopleByID(event.getPersonID());
@@ -127,7 +128,7 @@ public class SearchActivity extends AppCompatActivity {
         }
 
         private void bind(Person person) {
-            Log.println(Log.INFO, LOG_KEY, "Binding person: " + person);
+            //Log.println(Log.INFO, LOG_KEY, "Binding person: " + person);
             this.person = person;
             title.setText(String.format("%s %s", person.getFirstName(), person.getLastName()));
             description.setText(""); // blank space babay
@@ -166,7 +167,7 @@ public class SearchActivity extends AppCompatActivity {
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
             String searchString = charSequence.toString();
-            Log.println(Log.INFO, LOG_KEY, "OnTextChanged worked: " + searchString);
+            //Log.println(Log.INFO, LOG_KEY, "OnTextChanged worked: " + searchString);
 
             RecyclerView recyclerView = findViewById(R.id.recycler_view);
 
@@ -181,4 +182,17 @@ public class SearchActivity extends AppCompatActivity {
         public void afterTextChanged(Editable editable) {
         }
     };
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent(SearchActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }

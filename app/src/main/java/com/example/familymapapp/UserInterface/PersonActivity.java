@@ -1,10 +1,12 @@
 package com.example.familymapapp.UserInterface;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -21,6 +23,7 @@ import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 import com.joanzapata.iconify.fonts.FontAwesomeModule;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -51,23 +54,29 @@ public class PersonActivity extends AppCompatActivity {
 
         SortedSet<Event> lifeEvents = data.getEventsByPersonID(personID);
         for (Event event : lifeEvents) {
-            eventList.add(event);
+            if (data.isInFilters(event)) {
+                eventList.add(event);
+            }
         }
 
         //Probably function call on null errors here
-        List<Person> family = data.getChildrenByParentID(personID);
+        //kids
+        List<Person> family = data.getChildrenByParentID(personID); //ERROR this returns more and more after each click
         if (family == null) {
             family = new ArrayList<>();
         }
 
+        //spouse
         Person familyMember = data.getPeopleByID(selectedPerson.getSpouseID());
         if (familyMember != null) {
             family.add(familyMember);
         }
+        //father
         familyMember = data.getPeopleByID(selectedPerson.getFatherID());
         if (familyMember != null) {
             family.add(familyMember);
         }
+        //mother
         familyMember = data.getPeopleByID(selectedPerson.getMotherID());
         if (familyMember != null) {
             family.add(familyMember);
@@ -253,6 +262,19 @@ public class PersonActivity extends AppCompatActivity {
         @Override
         public boolean isChildSelectable(int i, int i1) {
             return true;
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent(PersonActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

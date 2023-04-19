@@ -72,7 +72,7 @@ public class ServerProxy {
             jsonResponse = new BufferedReader(new InputStreamReader(responseBody)).lines().collect(Collectors.joining(""));
         } else {
             //SERVER RETURNED AN HTTP ERROR
-            Log.println(Log.ERROR, LOG_KEY, "Error: " + connection.getResponseMessage());
+            //Log.println(Log.ERROR, LOG_KEY, "Error: " + connection.getResponseMessage());
             InputStream errorStream = connection.getErrorStream();
             jsonResponse = new BufferedReader(new InputStreamReader(errorStream)).lines().collect(Collectors.joining(""));
         }

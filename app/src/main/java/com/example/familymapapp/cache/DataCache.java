@@ -38,7 +38,8 @@ public class DataCache {
             }
 
             //compare years
-            int diffInYears = t1.getYear() - event.getYear();
+            int diffInYears = event.getYear() - t1.getYear();
+
             if (diffInYears != 0) return diffInYears;
             else {
                 //compare strings of event type
@@ -77,13 +78,31 @@ public class DataCache {
             eventsByPersonID.put(event.getPersonID(), eventList);
             eventTypes.add(event.getEventType());
         }
+        //fathers side
         String currentPersonID = user.getFatherID();
-        fatherSideMales.add(peopleByID.get(currentPersonID));
-        setFatherSide(currentPersonID);
+        if (currentPersonID != null) {
+            fatherSideMales.add(peopleByID.get(currentPersonID));
+            List<Person> family = getChildrenByParentID(currentPersonID);
+            if (family == null) {
+                family = new ArrayList<>();
+            }
+            family.add(peopleByID.get(userID));
+            childrenByParentID.put(currentPersonID, family);
+            setFatherSide(currentPersonID);
+        }
 
+        //mothers side
         currentPersonID = user.getMotherID();
-        motherSideFemales.add(peopleByID.get(currentPersonID));
-        setMotherSide(currentPersonID);
+        if (currentPersonID != null) {
+            motherSideFemales.add(peopleByID.get(currentPersonID));
+            List<Person> family = getChildrenByParentID(currentPersonID);
+            if (family == null) {
+                family = new ArrayList<>();
+            }
+            family.add(peopleByID.get(userID));
+            childrenByParentID.put(currentPersonID, family);
+            setMotherSide(currentPersonID);
+        }
 
         immediateFamilyFemales.add(peopleByID.get(user.getMotherID()));
         immediateFamilyMales.add(peopleByID.get(user.getFatherID()));
@@ -94,6 +113,8 @@ public class DataCache {
                 if (kid.getGender().equalsIgnoreCase("F")) { immediateFamilyFemales.add(kid); }
             }
         }
+
+        assert (peopleByID.get(userID) != null);
     }
 
     private void setFatherSide (String currentPersonID) {
@@ -105,37 +126,50 @@ public class DataCache {
         kidsList.add(currentPerson);
         childrenByParentID.put(currentPerson.getFatherID(), kidsList);
 
-        fatherSideMales.add(peopleByID.get(currentPerson.getFatherID()));
-        setFatherSide(currentPerson.getFatherID());
+        String fatherID = currentPerson.getFatherID();
+        if (fatherID != null) {
+            fatherSideMales.add(peopleByID.get(currentPerson.getFatherID()));
+            setFatherSide(currentPerson.getFatherID());
+        }
 
         kidsList = childrenByParentID.get(currentPerson.getMotherID());
         if (kidsList == null) { kidsList = new ArrayList<>(); }
         kidsList.add(currentPerson);
         childrenByParentID.put(currentPerson.getMotherID(), kidsList);
 
-        fatherSideFemales.add(peopleByID.get(currentPerson.getMotherID()));
-        setFatherSide(currentPerson.getMotherID());
+        String motherID = currentPerson.getMotherID();
+        if (motherID != null) {
+            fatherSideFemales.add(peopleByID.get(currentPerson.getMotherID()));
+            setFatherSide(currentPerson.getMotherID());
+        }
     }
 
     private void setMotherSide (String currentPersonID) {
         if (currentPersonID == null) { return; }
         Person currentPerson = peopleByID.get(currentPersonID);
 
-        List<Person> kidsList = childrenByParentID.get(currentPerson.getFatherID());
-        if (kidsList == null) { kidsList = new ArrayList<>(); }
-        kidsList.add(currentPerson);
-        childrenByParentID.put(currentPerson.getFatherID(), kidsList);
+        String fatherID = currentPerson.getFatherID();
 
-        motherSideMales.add(peopleByID.get(currentPerson.getFatherID()));
-        setMotherSide(currentPerson.getFatherID());
+        if (fatherID != null) {
+            List<Person> kidsList = childrenByParentID.get(currentPerson.getFatherID());
+            if (kidsList == null) { kidsList = new ArrayList<>(); }
+            kidsList.add(currentPerson);
+            childrenByParentID.put(currentPerson.getFatherID(), kidsList);
 
-        kidsList = childrenByParentID.get(currentPerson.getMotherID());
-        if (kidsList == null) { kidsList = new ArrayList<>(); }
-        kidsList.add(currentPerson);
-        childrenByParentID.put(currentPerson.getMotherID(), kidsList);
+            motherSideMales.add(peopleByID.get(fatherID));
+            setMotherSide(currentPerson.getFatherID());
+        }
 
-        motherSideFemales.add(peopleByID.get(currentPerson.getMotherID()));
-        setMotherSide(currentPerson.getMotherID());
+        String motherID = currentPerson.getMotherID();
+        if (motherID != null) {
+            List<Person> kidsList = childrenByParentID.get(currentPerson.getMotherID());
+            if (kidsList == null) { kidsList = new ArrayList<>(); }
+            kidsList.add(currentPerson);
+            childrenByParentID.put(currentPerson.getMotherID(), kidsList);
+
+            motherSideFemales.add(peopleByID.get(motherID));
+            setMotherSide(currentPerson.getMotherID());
+        }
     }
 
     private DataCache() {}
@@ -169,8 +203,17 @@ public class DataCache {
     }
 
     public SortedSet<Event> getEventsByPersonID(String personID) {
-        SortedSet<Event> toReturn = eventsByPersonID.get(personID);
         return eventsByPersonID.get(personID);
+    }
+
+    private boolean isEventRelated(Set<Person> people, Event event) {
+        String associatedPerson = event.getPersonID();
+        for (Person person : people) {
+            if (Objects.equals(person.getPersonID(), associatedPerson)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Comparator<Event> getEventComparator() {
@@ -239,7 +282,7 @@ public class DataCache {
             //Log.println(Log.INFO, LOG_KEY, "Person iterated: " + person.getFirstName());
             if (person.getFirstName().toLowerCase().contains(searchString)) {
                 toReturn.add(person);
-            } else if (person.getFirstName().toLowerCase().contains(searchString)) {
+            } else if (person.getLastName().toLowerCase().contains(searchString)) {
                 toReturn.add(person);
             }
         }
@@ -251,18 +294,69 @@ public class DataCache {
         Iterator i = eventByID.values().iterator();
         while(i.hasNext()) {
             Event event = (Event) i.next();
-            Log.println(Log.INFO, LOG_KEY, "event iterated: " + event.getEventID());
-            if (event.getCity().toLowerCase().contains(searchString)) {
-                toReturn.add(event);
-            } else if (event.getCountry().toLowerCase().contains(searchString)) {
-                toReturn.add(event);
+            if (isInFilters(event)) {
+                if (event.getCity().toLowerCase().contains(searchString)) {
+                    toReturn.add(event);
+                } else if (event.getCountry().toLowerCase().contains(searchString)) {
+                    toReturn.add(event);
+                } else if (event.getEventType().toLowerCase().contains(searchString)) {
+                    toReturn.add(event);
+                }else {
+                    Integer year = new Integer(event.getYear());
+                    if (year.toString().contains(searchString)) {
+                        toReturn.add(event);
+                    }
+                }
             }
         }
         return toReturn;
+    }
+
+    public boolean isInFilters(Event event) {
+        SettingsCache settings = SettingsCache.getInstance();
+
+        if (settings.isMaleEvents) {
+            if (settings.isFatherSide) {
+                if (isEventRelated(fatherSideMales, event)) {
+                    return true;
+                }
+            }
+            if (settings.isMotherSide) {
+                if (isEventRelated(motherSideMales, event)) {
+                    return true;
+                }
+            }
+        }
+        if (settings.isFemaleEvents) {
+            if (settings.isFatherSide) {
+                if (isEventRelated(fatherSideFemales, event)) {
+                    return true;
+                }
+            }
+            if (settings.isMotherSide) {
+                if (isEventRelated(motherSideFemales, event)) {
+                    return true;
+                }
+            }
+        }
+        //todo might return false on user and spouse
+        if (settings.isFemaleEvents) {
+            if (DataCache.getInstance().getPeopleByID(event.getPersonID()).getGender().equalsIgnoreCase("F")) {
+                return true;
+            }
+        }
+        if (settings.isMaleEvents) {
+            if (DataCache.getInstance().getPeopleByID(event.getPersonID()).getGender().equalsIgnoreCase("M")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void logout() {
         instance = null;
         authtoken = null;
     }
+
 }

@@ -9,13 +9,13 @@ public class SettingsCache {
         }
         return instance;
     }
-    boolean isLifeStoryLines;
-    boolean isFamilyTreeLines;
-    boolean isSpouseLines;
-    boolean isFatherSide;
-    boolean isMotherSide;
-    boolean isMaleEvents;
-    boolean isFemaleEvents;
+    boolean isLifeStoryLines = true;
+    boolean isFamilyTreeLines = true;
+    boolean isSpouseLines = true;
+    boolean isFatherSide = true;
+    boolean isMotherSide = true;
+    boolean isMaleEvents = true;
+    boolean isFemaleEvents = true;
 
     public void setSettings(boolean lifeStoryLines, boolean isFamilyTreeLines,
                                   boolean isSpouseLines, boolean isFatherSide,
