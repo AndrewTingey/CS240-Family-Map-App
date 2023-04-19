@@ -36,9 +36,6 @@ import Model.Person;
 public class SearchActivity extends AppCompatActivity {
     private final int PERSON_KEY = 0;
     private final int EVENT_KEY = 1;
-    private final String LOG_KEY = "SearchActivity";
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +73,6 @@ public class SearchActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull SearchActivityViewHolder holder, int position) {
-            //Log.println(Log.INFO, LOG_KEY, "Logging position: " + position);
             if (position < personList.size()) {
                 holder.bind(personList.get(position));
             } else {
@@ -116,7 +112,6 @@ public class SearchActivity extends AppCompatActivity {
         }
 
         private void bind(Event event) {
-            //Log.println(Log.INFO, LOG_KEY, "Binding event: " + event);
             this.event = event;
             title.setText(String.format("%s: %s, %s (%d)", event.getEventType(), event.getCity(), event.getCountry(), event.getYear()));
             Person associatedPerson = DataCache.getInstance().getPeopleByID(event.getPersonID());
@@ -128,7 +123,6 @@ public class SearchActivity extends AppCompatActivity {
         }
 
         private void bind(Person person) {
-            //Log.println(Log.INFO, LOG_KEY, "Binding person: " + person);
             this.person = person;
             title.setText(String.format("%s %s", person.getFirstName(), person.getLastName()));
             description.setText(""); // blank space babay
@@ -146,8 +140,9 @@ public class SearchActivity extends AppCompatActivity {
         public void onClick(View view) {
             if (viewType == EVENT_KEY) {
                 //Toast.makeText(SearchActivity.this, String.format("Event clicked: %s", event.getEventID()), Toast.LENGTH_SHORT).show();
+                //switch to event activity
                 Intent intent = new Intent(SearchActivity.this, EventActivity.class);
-                intent.putExtra(EventActivity.SELECTED_EVENT_KEY, event.getEventID());
+                intent.putExtra(PersonActivity.SELECTED_EVENT_KEY, event.getEventID());
                 startActivity(intent);
             } else {
                 //Toast.makeText(SearchActivity.this, String.format("Person clicked: %s", person.getFirstName()), Toast.LENGTH_SHORT).show();

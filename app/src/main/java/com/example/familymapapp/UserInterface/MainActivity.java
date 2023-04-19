@@ -19,6 +19,7 @@ import com.example.familymapapp.cache.DataCache;
 
 import com.example.familymapapp.UserInterface.LoginFragment;
 import com.example.familymapapp.UserInterface.MapsFragment;
+import com.example.familymapapp.cache.SettingsCache;
 import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.Iconify;
 import com.joanzapata.iconify.fonts.FontAwesomeIcons;
@@ -26,8 +27,16 @@ import com.joanzapata.iconify.fonts.FontAwesomeModule;
 
 public class MainActivity extends AppCompatActivity implements LoginFragment.Listener, MapsFragment.Listener {
     String authtoken = null;
-    private final String AUTHTOKEN_KEY = "AuthtokenKey";
-    private final String HAS_MENU_KEY  = "MenuKey";
+    public static final String AUTHTOKEN_KEY = "AuthtokenKey";
+    //todo, use these keys to get saved settings values across app restart for extra credit
+    public static final String LIFE_STORY_KEY = "LifeStoryKey";
+    private final String FAMILY_TREE_KEY = "FamilyTreeKey";
+    private final String SPOUSE_KEY = "SpouseLinesKey";
+    private final String FATHER_KEY = "FathersSideKey";
+    private final String MOTHER_KEY = "MothersSideKey";
+    private final String MALE_KEY = "MaleEventsKey";
+    private final String FEMALE_KEY = "FemaleEventsKey";
+    public static final String HAS_MENU_KEY  = "MenuKey";
     private final String LOG_TAG = "MainActivity";
 
     @Override
@@ -35,13 +44,23 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        authtoken = DataCache.getInstance().getAuthtoken();
         Iconify.with(new FontAwesomeModule());
+        Log.println(Log.INFO, LOG_TAG, "savedInstanceState is: " + savedInstanceState);
 
         if (savedInstanceState != null) {
             // Retrieve authtoken from savedinstancestate if it exists
             SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
             authtoken = sharedPreferences.getString(AUTHTOKEN_KEY, null);
+
+            boolean lifeStory = sharedPreferences.getBoolean(LIFE_STORY_KEY, true);
+            boolean familyTree = sharedPreferences.getBoolean(FAMILY_TREE_KEY, true);
+            boolean spouseLines = sharedPreferences.getBoolean(SPOUSE_KEY, true);
+            boolean fatherSide = sharedPreferences.getBoolean(FATHER_KEY, true);
+            boolean motherSide = sharedPreferences.getBoolean(MOTHER_KEY, true);
+            boolean maleEvents = sharedPreferences.getBoolean(MALE_KEY, true);
+            boolean femaleEvents = sharedPreferences.getBoolean(FEMALE_KEY, true);
+
+            SettingsCache.getInstance().setSettings(lifeStory, familyTree, spouseLines, fatherSide, motherSide, maleEvents, femaleEvents);
             Log.println(Log.INFO, LOG_TAG, "Loaded authtoken from saved instance");
         } else {
             authtoken = DataCache.getInstance().getAuthtoken();
@@ -62,11 +81,6 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
                 ((MapsFragment) fragment).registerListener(this);
             }
         }
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
     }
 
     private Fragment createFirstFragment() {
@@ -90,8 +104,6 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
         //switch views here
         this.authtoken = authtoken;
 
-        //TODO COMMENTED OUT FOR CACHING DATA AND DEBUGGING
-
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         Fragment fragment = createFirstFragment();
 
@@ -107,6 +119,17 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
         SharedPreferences.Editor editor = sharedPreferences.edit();
         String savedAuthtoken = DataCache.getInstance().getAuthtoken();
         editor.putString(AUTHTOKEN_KEY, savedAuthtoken);
-        editor.apply();
+        Log.println(Log.INFO, LOG_TAG, "Authtoken saved in onStop(): " + authtoken);
+
+        SettingsCache settings = SettingsCache.getInstance();
+        editor.putBoolean(LIFE_STORY_KEY, settings.isLifeStoryLines());
+        editor.putBoolean(FAMILY_TREE_KEY, settings.isFamilyTreeLines());
+        editor.putBoolean(SPOUSE_KEY, settings.isSpouseLines());
+        editor.putBoolean(FATHER_KEY, settings.isFatherSide());
+        editor.putBoolean(MOTHER_KEY, settings.isMotherSide());
+        editor.putBoolean(MALE_KEY, settings.isMaleEvents());
+        editor.putBoolean(FEMALE_KEY, settings.isFemaleEvents());
+        //editor.apply();
+        editor.commit();
     }
 }

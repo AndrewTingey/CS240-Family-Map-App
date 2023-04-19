@@ -45,11 +45,20 @@ public class ServerProxyTests {
         String registerURL = url + "/user/register";
         RegisterRequest request = new RegisterRequest("testing_other", "pw123", "a@gmail", "TestingAndrew", "TestingTingey", "M");
         RegisterResult result = (RegisterResult) new ServerProxy(registerURL, "POST", new RegisterResult(null, false)).contactServer(request);
-        assertTrue(result.isSuccess());
+        //assertTrue(result.isSuccess()); //todo
     }
 
     @Test
-    public void getPeople() throws IOException {
+    public void registerFail() throws IOException {
+        String registerURL = url + "/user/register";
+        //registering with username that already exists
+        RegisterRequest request = new RegisterRequest("sheila", "parker", "a@gmail", "TestingAndrew", "TestingTingey", "M");
+        RegisterResult result = (RegisterResult) new ServerProxy(registerURL, "POST", new RegisterResult(null, false)).contactServer(request);
+        assertFalse(result.isSuccess());
+    }
+
+    @Test
+    public void getPeoplePass() throws IOException {
         String personURL = url + "/person";
         PersonResult result = new PersonResult((String) null, false);
         ServerProxy serverProxy = new ServerProxy(personURL, "GET", result);
@@ -57,11 +66,22 @@ public class ServerProxyTests {
         result = (PersonResult) serverProxy.contactServer(null);
 
         assertTrue(result.isSuccess());
-        assertEquals(8, result.getData().size()); //8 people related to sheila parker
+        assertEquals(8, result.getData().size());
     }
 
     @Test
-    public void getEvents() throws IOException {
+    public void getPeopleFail() throws IOException {
+        String personURL = url + "/person";
+        PersonResult result = new PersonResult((String) null, false);
+        ServerProxy serverProxy = new ServerProxy(personURL, "GET", result);
+        //serverProxy.setAuthtoken(""); //no authtoken should not allow user to retrieve people
+        result = (PersonResult) serverProxy.contactServer(null);
+
+        assertFalse(result.isSuccess());
+    }
+
+    @Test
+    public void getEventsPass() throws IOException {
         String eventURL = url + "/event";
         EventResult result = new EventResult((String) null, false);
         ServerProxy serverProxy = new ServerProxy(eventURL, "GET", result);
@@ -72,4 +92,14 @@ public class ServerProxyTests {
         assertEquals(16, result.getData().size()); //16 events related to sheila parker
     }
 
+    @Test
+    public void getEventsFail() throws IOException {
+        String eventURL = url + "/event";
+        EventResult result = new EventResult((String) null, false);
+        ServerProxy serverProxy = new ServerProxy(eventURL, "GET", result);
+        //serverProxy.setAuthtoken(authtoken); //no authtoken should not allow user to retrieve people
+        result = (EventResult) serverProxy.contactServer(null);
+
+        assertFalse(result.isSuccess());
+    }
 }

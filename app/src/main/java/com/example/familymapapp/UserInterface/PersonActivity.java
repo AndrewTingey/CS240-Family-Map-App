@@ -59,7 +59,6 @@ public class PersonActivity extends AppCompatActivity {
             }
         }
 
-        //Probably function call on null errors here
         //kids
         List<Person> family = data.getChildrenByParentID(personID); //ERROR this returns more and more after each click
         if (family == null) {
@@ -233,7 +232,7 @@ public class PersonActivity extends AppCompatActivity {
             PersonName.setText(String.format("%s %s", person.getFirstName(), person.getLastName()));
 
             TextView relationship = personItemView.findViewById(R.id.eventDescription);
-            String relationToPerson = getRelation(person.getPersonID());
+            String relationToPerson = getRelation(selectedPerson.getPersonID(), person.getPersonID());
             relationship.setText(relationToPerson);
 
             ImageView icon = personItemView.findViewById(R.id.mapEventImage);
@@ -278,19 +277,26 @@ public class PersonActivity extends AppCompatActivity {
         }
     }
 
-    private String getRelation(String person2ID) {
-        if (Objects.equals(selectedPerson.getFatherID(), person2ID)) {
+    public static String getRelation(String personID, String person2ID) {
+        Person person1 = DataCache.getInstance().getPeopleByID(personID);
+        if (Objects.equals(person1.getFatherID(), person2ID)) {
             return "Father";
-        } else if (Objects.equals(selectedPerson.getMotherID(), person2ID)) {
+        } else if (Objects.equals(person1.getMotherID(), person2ID)) {
             return "Mother";
-        } else if (Objects.equals(selectedPerson.getSpouseID(), person2ID)) {
+        } else if (Objects.equals(person1.getSpouseID(), person2ID)) {
             return "Spouse";
         } else {
-            String gender = DataCache.getInstance().getPeopleByID(person2ID).getGender();
-            if (gender.equalsIgnoreCase("M")) {
-                return "Son";
+            //person1 is parent of person2?
+            Person person2 = DataCache.getInstance().getPeopleByID(person2ID);
+            if (Objects.equals(personID, person2.getMotherID()) || Objects.equals(personID, person2.getFatherID())) {
+                String gender = person2.getGender();
+                if (gender.equalsIgnoreCase("M")) {
+                    return "Son";
+                } else {
+                    return "Daughter";
+                }
             } else {
-                return "Daughter";
+                return "Persons are not immediately related";
             }
         }
     }

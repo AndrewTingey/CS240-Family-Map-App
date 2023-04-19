@@ -18,9 +18,7 @@ import com.example.familymapapp.cache.DataCache;
 import com.example.familymapapp.cache.SettingsCache;
 
 public class SettingsActivity extends AppCompatActivity {
-
     private final String LOG_TAG = "SettingsActivity";
-    private final String LIFE_STORY_LINES = "LifeStoryKey";
     private Switch lifeStory;
     private Switch familyTree;
     private Switch spouseLines;
@@ -41,10 +39,10 @@ public class SettingsActivity extends AppCompatActivity {
         maleEvents = findViewById(R.id.MaleEvents);
         femaleEvents = findViewById(R.id.FemaleEvents);
 
-        if (savedInstanceState != null) {
-            boolean isLifeStory = savedInstanceState.getBoolean(LIFE_STORY_LINES, false);
+        if (savedInstanceState != null) { //todo load from saved instance for extra credit
+            boolean isLifeStory = savedInstanceState.getBoolean(MainActivity.LIFE_STORY_KEY, false);
             lifeStory.setChecked(isLifeStory);
-            Log.println(Log.INFO, LOG_TAG, "From savedinstancestate");
+            Log.println(Log.INFO, LOG_TAG, "From saved instance state");
         } else {
             SettingsCache settings = SettingsCache.getInstance();
             lifeStory.setChecked(settings.isLifeStoryLines());
@@ -54,7 +52,7 @@ public class SettingsActivity extends AppCompatActivity {
             motherSide.setChecked(settings.isMotherSide());
             maleEvents.setChecked(settings.isMaleEvents());
             femaleEvents.setChecked(settings.isFemaleEvents());
-            Log.println(Log.INFO, LOG_TAG, "not from savedinstancestate");
+            Log.println(Log.INFO, LOG_TAG, "not from saved instance state");
         }
 
 
@@ -72,8 +70,8 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         SettingsCache settings = SettingsCache.getInstance();
         settings.setSettings(lifeStory.isChecked(), familyTree.isChecked(), spouseLines.isChecked(), fatherSide.isChecked(), motherSide.isChecked(), maleEvents.isChecked(), femaleEvents.isChecked());
         Log.println(Log.INFO, LOG_TAG, "Life Story Lines was saved from onStop() as: " + lifeStory.isChecked());

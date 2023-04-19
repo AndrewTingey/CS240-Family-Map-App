@@ -60,7 +60,6 @@ public class DataCache {
     private final Set<Person> motherSideMales = new HashSet<>();
     private final Set<Person> motherSideFemales = new HashSet<>();
 
-    //to load data
     public void loadData(List<Event> events, List<Person> people, String userID, String authtoken) {
         instance = getInstance();
         this.authtoken = authtoken;
@@ -339,15 +338,17 @@ public class DataCache {
                 }
             }
         }
-        //todo might return false on user and spouse
-        if (settings.isFemaleEvents) {
-            if (DataCache.getInstance().getPeopleByID(event.getPersonID()).getGender().equalsIgnoreCase("F")) {
-                return true;
+        //check - might return false on user and spouse because they dont show up in father or mother events - done
+        if (Objects.equals(event.getPersonID(), DataCache.getInstance().getUser().getPersonID()) || Objects.equals(event.getPersonID(), DataCache.getInstance().getUser().getSpouseID())) {
+            if (settings.isFemaleEvents) {
+                if (DataCache.getInstance().getPeopleByID(event.getPersonID()).getGender().equalsIgnoreCase("F")) {
+                    return true;
+                }
             }
-        }
-        if (settings.isMaleEvents) {
-            if (DataCache.getInstance().getPeopleByID(event.getPersonID()).getGender().equalsIgnoreCase("M")) {
-                return true;
+            if (settings.isMaleEvents) {
+                if (DataCache.getInstance().getPeopleByID(event.getPersonID()).getGender().equalsIgnoreCase("M")) {
+                    return true;
+                }
             }
         }
 

@@ -1,6 +1,5 @@
 package com.example.familymapapp.UserInterface;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -46,15 +45,12 @@ public class LoginFragment extends Fragment {
 
     //Static keys
     private static final String SUCCESS_KEY = "SuccessKey";
-    private static final String AUTHTOKEN_KEY = "AuthtokenKey";
     private static final String FIRST_NAME_KEY = "FirstNameKey";
     private static final String LAST_NAME_KEY = "LastNameKey";
     private static final String PERSONID_KEY = "PersonIDKey";
-    private static final String LOG_KEY = "MainActivity";
     private static final String MESSAGE_KEY = "MessageKey";
+    private static final String LOG_TAG = "MainActivity";
     private String gender = null;
-    Person user = null;
-
     EditText serverHostNumber;
     EditText serverPortNumber;
     EditText username;
@@ -97,15 +93,14 @@ public class LoginFragment extends Fragment {
         genderButtons.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-                //boolean checked = ((RadioButton) view).isChecked();
                 // Check which radio button was clicked
                 switch(checkedId) {
                     case R.id.femaleButton:
-                        Log.println(Log.INFO, LOG_KEY, "Female button hit");
+                        Log.println(Log.INFO, LOG_TAG, "Female button hit");
                         gender = "F";
                         break;
                     case R.id.maleButton:
-                        Log.println(Log.INFO, LOG_KEY, "Male button hit");
+                        Log.println(Log.INFO, LOG_TAG, "Male button hit");
                         gender = "M";
                         break;
                 }
@@ -125,11 +120,10 @@ public class LoginFragment extends Fragment {
                     public void handleMessage(Message message) {
                         Bundle bundle = message.getData();
                         boolean success = bundle.getBoolean(SUCCESS_KEY);
-                        String authtoken = bundle.getString(AUTHTOKEN_KEY);
+                        String authtoken = bundle.getString(MainActivity.AUTHTOKEN_KEY);
                         String personID = bundle.getString(PERSONID_KEY);
                         String errorMessage = bundle.getString(MESSAGE_KEY);
                         if (success) {
-                            //Log.println(Log.INFO, LOG_KEY, "Success");
                             Handler dataSyncHandler = new Handler(Looper.getMainLooper()){
                                 @Override
                                 public void handleMessage(Message message1) {
@@ -139,14 +133,14 @@ public class LoginFragment extends Fragment {
                                     String lastName = dataSyncBundle.getString(LAST_NAME_KEY);
                                     //cache this data
                                     if (success) {
-                                        Log.println(Log.INFO, LOG_KEY, "DataSyncHandler success!");
+                                        Log.println(Log.INFO, LOG_TAG, "DataSyncHandler success!");
                                         listener.notifyDone(authtoken);
                                     } else {
-                                        Log.println(Log.INFO, LOG_KEY, "ERROR IN DATASYNC");
+                                        Log.println(Log.ERROR, LOG_TAG, "ERROR IN DATASYNC");
                                     }
                                     String welcomeString = getString(R.string.welcome, firstName, lastName);
                                     Toast.makeText(getActivity(), welcomeString, Toast.LENGTH_LONG).show();
-                                    Log.println(Log.INFO, LOG_KEY, "Welcome back, " + firstName + " " + lastName);
+                                    Log.println(Log.INFO, LOG_TAG, "Welcome back, " + firstName + " " + lastName);
                                 }
                             };
 
@@ -155,7 +149,7 @@ public class LoginFragment extends Fragment {
                             ExecutorService executor = Executors.newSingleThreadExecutor();
                             executor.submit(dataSyncTask);
                         } else {
-                            Log.println(Log.ERROR, LOG_KEY, errorMessage);
+                            Log.println(Log.ERROR, LOG_TAG, errorMessage);
                             String failString = getString(R.string.failure, errorMessage);
                             Toast.makeText(getActivity(), failString, Toast.LENGTH_LONG).show();
                         }
@@ -177,13 +171,13 @@ public class LoginFragment extends Fragment {
                         Bundle bundle = message.getData();
                         boolean success = bundle.getBoolean(SUCCESS_KEY);
                         String errorMessage = bundle.getString(MESSAGE_KEY);
-                        String authtoken = bundle.getString(AUTHTOKEN_KEY);
+                        String authtoken = bundle.getString(MainActivity.AUTHTOKEN_KEY);
                         if (success) {
                             listener.notifyDone(authtoken);
-                            Log.println(Log.INFO, LOG_KEY, "Register Success");
+                            Log.println(Log.INFO, LOG_TAG, "Register Success");
                             Toast.makeText(getActivity(), R.string.success, Toast.LENGTH_LONG).show();
                         } else {
-                            Log.println(Log.ERROR, LOG_KEY, errorMessage);
+                            Log.println(Log.ERROR, LOG_TAG, errorMessage);
                             String failString = getString(R.string.failure, errorMessage);
                             Toast.makeText(getActivity(), failString, Toast.LENGTH_LONG).show();
                         }
@@ -217,7 +211,7 @@ public class LoginFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable editable) {
-            Log.println(Log.INFO, LOG_KEY, "TextChange worked");
+            Log.println(Log.INFO, LOG_TAG, "TextChange worked");
             // check Fields For Empty Values
             checkFieldsForEmptyValues();
         }

@@ -14,19 +14,17 @@ import com.example.familymapapp.R;
 import com.example.familymapapp.cache.DataCache;
 
 import Model.Event;
+import Model.Person;
 
 public class EventActivity extends AppCompatActivity implements MapsFragment.Listener {
-
-    public static final String SELECTED_EVENT_KEY = "EventIDKey";
     private static final String LOG_TAG = "EventActivity";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
 
         Intent intent = getIntent();
-        String selectedEventID = intent.getStringExtra(SELECTED_EVENT_KEY);
+        String selectedEventID = intent.getStringExtra(PersonActivity.SELECTED_EVENT_KEY);
         Log.println(Log.INFO, LOG_TAG, "Selected EventID recieved: " + selectedEventID);
         Event event = DataCache.getInstance().getEventByID(selectedEventID);
         Log.println(Log.INFO, LOG_TAG, "Event recieved: " + event.getEventID());

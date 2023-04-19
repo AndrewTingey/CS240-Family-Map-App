@@ -44,11 +44,10 @@ import Model.Person;
 public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
     private GoogleMap map;
     private View view;
-    private final String LOG_TAG = "MapsFragment";
-    private final String HAS_MENU_KEY  = "MenuKey";
     private Event selectedEvent = null;
     private boolean hasMenu = false;
     private Listener listener;
+    private final String LOG_TAG = "MapsFragment";
 
 
     public interface Listener {
@@ -71,9 +70,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         super.onResume();
         setHasOptionsMenu(hasMenu);
 
+        Log.println(Log.INFO, LOG_TAG, "MAP: " + map);
         //check if logged out
         if (DataCache.getInstance().getAuthtoken() == null) {
             listener.notifyDone(null);
+        }
+        if (map != null && selectedEvent != null) {
+            Log.println(Log.INFO, LOG_TAG, "SETTING MARKERS");
+            animateCamera();
         }
     }
     @Override
@@ -117,7 +121,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            hasMenu = getArguments().getBoolean(HAS_MENU_KEY); //todo make login fragment pass a false here, EventActivity
+            hasMenu = getArguments().getBoolean(MainActivity.HAS_MENU_KEY);
         }
         setHasOptionsMenu(hasMenu);
     }
@@ -160,11 +164,29 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
         map.setOnMapLoadedCallback(this);
-        //setMarkers(); moevd to on map loaded
+        setMarkers(); //moevd to on map loaded
         if (this.selectedEvent != null) {
             animateCamera();
         }
         Log.println(Log.INFO, LOG_TAG, "onMapReadyCalleed");
+    }
+    @Override
+    public void onMapLoaded() {
+        Log.println(Log.INFO, LOG_TAG, "onMapLoaded called");
+        //setMarkers();
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Log.println(Log.INFO, LOG_TAG, "Marker clicked: " + marker.toString());
+                if (marker != null) {
+                    String eventID = (String) marker.getTag();
+                    setSelectedEvent(DataCache.getInstance().getEventByID(eventID));
+                    animateCamera();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     public void setSelectedEvent(Event selectedEvent) {
@@ -207,23 +229,53 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         setMarkers();
         drawAllLines(selectedEvent);
     }
-    @Override
-    public void onMapLoaded() {
-        Log.println(Log.INFO, LOG_TAG, "onMapLoaded called");
-        setMarkers();
-        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                Log.println(Log.INFO, LOG_TAG, "Marker clicked: " + marker.toString());
-                if (marker != null) {
-                    String eventID = (String) marker.getTag();
-                    setSelectedEvent(DataCache.getInstance().getEventByID(eventID));
-                    animateCamera();
-                    return true;
-                }
-                return false;
+    private void setMarkers() {
+        //CHECK SETTINGS FOR VALUES
+        DataCache data = DataCache.getInstance();
+        SettingsCache settings = SettingsCache.getInstance();
+        boolean fatherSide = settings.isFatherSide();
+        boolean motherSide = settings.isMotherSide();
+        boolean maleEvents = settings.isMaleEvents();
+        boolean femaleEvents = settings.isFemaleEvents();
+
+        Set<Person> peopleToAdd = new HashSet<>();
+        //add user and spouse always unconditionally
+        Person user = data.getUser();
+        peopleToAdd.add(user);
+        peopleToAdd.add(data.getPeopleByID(user.getSpouseID()));
+
+
+        //conditionally add ancestors
+        if (maleEvents) {
+            if (fatherSide) {
+                peopleToAdd.addAll(data.getFatherSideMales());
             }
-        });
+            if (motherSide) {
+                peopleToAdd.addAll(data.getMotherSideMales());
+            }
+        } if (femaleEvents) {
+            if (fatherSide) {
+                peopleToAdd.addAll(data.getFatherSideFemales());
+            }
+            if (motherSide) {
+                peopleToAdd.addAll(data.getMotherSideFemales());
+            }
+        }
+
+        for (Person personToAdd : peopleToAdd) {
+            if (personToAdd == null) { continue; }
+            //add this person's events to map
+            String personID = personToAdd.getPersonID();
+            SortedSet<Event> eventsToDisplay = data.getEventsByPersonID(personID);
+            for (Event event : eventsToDisplay) {
+                if (data.isInFilters(event)) {
+                    float eventColor = getEventColor(event.getEventType());
+                    Marker marker = map.addMarker(new MarkerOptions().position(new
+                            LatLng(event.getLatitude(), event.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(eventColor)));
+                    marker.setTag(event.getEventID());
+                }
+            }
+        }
     }
 
     private void drawAllLines(Event event) {
@@ -239,8 +291,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
                 Event spouseBirthEvent = spouseLifeEvents.first();
 
                 drawSingleLine(event, spouseBirthEvent, Color.CYAN, 10);
-            } else {
-                Log.println(Log.INFO, LOG_TAG, "Person has no spouse");
             }
         }
 
@@ -254,13 +304,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
             if (fatherBirthEvent != null) {
                 drawSingleLine(event, fatherBirthEvent, Color.BLUE, 17);
-            } else {
-                Log.println(Log.INFO, LOG_TAG, "Person has no father");
             }
             if (motherBirthEvent != null) {
                 drawSingleLine(event, motherBirthEvent, Color.RED, 17);
-            }else {
-                Log.println(Log.INFO, LOG_TAG, "Person has no mother");
             }
         }
 
@@ -312,58 +358,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
                 .color(googleColor)
                 .width(width);
         Polyline line = map.addPolyline(options);
-    }
-
-    private void setMarkers() {
-        //CHECK SETTINGS FOR VALUES
-        DataCache data = DataCache.getInstance();
-        SettingsCache settings = SettingsCache.getInstance();
-        boolean fatherSide = settings.isFatherSide();
-        boolean motherSide = settings.isMotherSide();
-        boolean maleEvents = settings.isMaleEvents();
-        boolean femaleEvents = settings.isFemaleEvents();
-
-        Set<Person> peopleToAdd = new HashSet<>();
-        //add user and spouse always unconditionally
-        Person user = data.getUser();
-        peopleToAdd.add(user);
-        peopleToAdd.add(data.getPeopleByID(user.getSpouseID()));
-
-        //todo check this, might be redundant
-        //conditionally add ancestors
-        if (maleEvents) {
-            //peopleToAdd.addAll(data.getImmediateFamilyMales());
-            if (fatherSide) {
-                peopleToAdd.addAll(data.getFatherSideMales());
-            }
-            if (motherSide) {
-                peopleToAdd.addAll(data.getMotherSideMales());
-            }
-        } if (femaleEvents) {
-            //peopleToAdd.addAll(data.getImmediateFamilyFemales());
-            if (fatherSide) {
-                peopleToAdd.addAll(data.getFatherSideFemales());
-            }
-            if (motherSide) {
-                peopleToAdd.addAll(data.getMotherSideFemales());
-            }
-        }
-
-        for (Person personToAdd : peopleToAdd) {
-            if (personToAdd == null) { continue; }
-            //add this persons events to map
-            String personID = personToAdd.getPersonID();
-            //Log.println(Log.INFO, LOG_TAG, "Adding person: " + personID);
-            SortedSet<Event> eventsToDisplay = data.getEventsByPersonID(personToAdd.getPersonID());
-            for (Event event : eventsToDisplay) {
-                if (data.isInFilters(event)) {
-                    float eventColor = getEventColor(event.getEventType());
-                    Marker marker = map.addMarker(new MarkerOptions().position(new
-                            LatLng(event.getLatitude(), event.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(eventColor)));
-                    marker.setTag(event.getEventID());
-                }
-            }
-        }
     }
 
     public static float getEventColor(String eventType) {
